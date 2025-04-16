@@ -8,15 +8,18 @@ function add(numbers) {
         const delimiterEndIndex = numbers.indexOf("\n");
         const customDelimiter = numbers.slice(2, delimiterEndIndex);
 
-        // Escape special regex characters in delimiter
-        const escapedDelimiter = customDelimiter.replace(/[[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-        delimiterPattern = new RegExp(escapedDelimiter);
-
-        // Get the actual numbers part of the string
-        numberString = numbers.slice(delimiterEndIndex + 1);
+        delimiterPattern = new RegExp(customDelimiter.replace(/[[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+        numberString = numbers.slice(delimiterEndIndex + 1);  // Get the numbers part
     }
 
-    const numberList = numberString.split(delimiterPattern).map(n => parseInt(n, 10));
+    const numberList = numberString.split(delimiterPattern).map(num => {
+        const parsed = parseInt(num, 10);
+        if (isNaN(parsed)) {
+            throw new Error(`Invalid number: ${num}`);
+        }
+        return parsed;
+    });
+
 
     const negativeNum = numberList.filter(num => num < 0);
 
@@ -37,5 +40,7 @@ console.log(add("1\n2,3"));  // Output: 6
 console.log(add("4\n5\n6")); // Output: 15
 console.log(add("//;\n1;2"));   // Output: 3
 console.log(add("//|\n4|5|6")); // Output: 15
-console.log(add("1,-2,3"));       // Should throw: "negative numbers not allowed: -2"
-console.log(add("1,-2,-3,4"));    // Should throw: "negative numbers not allowed: -2,-3"
+console.log(add("//;\n1;2,a"));   // Output: 3
+console.log(add("//;\n1;b,2,a"));   // Throws: Invalid number: {num}
+// console.log(add("1,-2,3"));       // Throws: "negative numbers not allowed: -2"
+// console.log(add("1,-2,-3,4"));    // Throws : "negative numbers not allowed: -2,-3"
