@@ -9,16 +9,22 @@ function add(numbers) {
         const customDelimiter = numbers.slice(2, delimiterEndIndex);
 
         delimiterPattern = new RegExp(customDelimiter.replace(/[[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
-        numberString = numbers.slice(delimiterEndIndex + 1);  // Get the numbers part
+        numberString = numbers.slice(delimiterEndIndex + 1);
     }
+
+    let invalidNumbers = [];
 
     const numberList = numberString.split(delimiterPattern).map(num => {
         const parsed = parseInt(num, 10);
         if (isNaN(parsed)) {
-            throw new Error(`Invalid number: ${num}`);
+            invalidNumbers.push(num);
         }
         return parsed;
     });
+
+    if (invalidNumbers.length > 0) {
+        throw new Error(`Invalid numbers: ${invalidNumbers.join(", ")}`);
+    }
 
 
     const negativeNum = numberList.filter(num => num < 0);
@@ -41,6 +47,6 @@ console.log(add("4\n5\n6")); // Output: 15
 console.log(add("//;\n1;2"));   // Output: 3
 console.log(add("//|\n4|5|6")); // Output: 15
 console.log(add("//;\n1;2,a"));   // Output: 3
-console.log(add("//;\n1;b,2,a"));   // Throws: Invalid number: {num}
+console.log(add("//;\n1;b,2,a"));   // Throws: Invalid number: b,2,a
 // console.log(add("1,-2,3"));       // Throws: "negative numbers not allowed: -2"
 // console.log(add("1,-2,-3,4"));    // Throws : "negative numbers not allowed: -2,-3"
